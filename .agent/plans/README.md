@@ -1,5 +1,14 @@
 # Unbed Implementation Plan
 
+## Completed Updates
+
+- STEP1 completed: monorepo skeleton, Android Gradle baseline, and repo scripts were initialized.
+- STEP2 completed: core alarm entities, release condition abstraction, and state machine were implemented.
+- STEP3 completed: Room schema, repository bridge, and next-trigger calculation were added.
+- STEP4 completed: Compose alarm settings UI now saves locally and reschedules the next alarm.
+- STEP5 completed: AlarmManager scheduling, receiver dispatch, and re-schedule conflict handling were connected.
+- STEP6 completed: high-priority alarm notification, full-screen ringing activity, and playback control were added.
+
 ## STEP1: リポジトリ基盤を作る
 - `.agent/docs` と整合するモノレポ骨格を作る
 - `apps/android`, `apps/ios`, `packages/domain-spec`, `backend`, `scripts` を用意する
