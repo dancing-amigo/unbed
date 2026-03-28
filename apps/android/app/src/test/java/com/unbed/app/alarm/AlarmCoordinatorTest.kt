@@ -7,9 +7,11 @@ import com.unbed.core.model.AlarmState
 import com.unbed.domain.alarm.AlarmConfigRepository
 import com.unbed.domain.alarm.AlarmSessionRepository
 import com.unbed.domain.alarm.AlarmStateMachine
+import com.unbed.domain.alarm.ManualReleaseHandler
 import com.unbed.domain.alarm.NextTrigger
 import com.unbed.domain.alarm.NextTriggerCalculator
 import com.unbed.domain.alarm.NextTriggerType
+import com.unbed.domain.alarm.ReleaseConditionHandlerRegistry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,6 +35,10 @@ class AlarmCoordinatorTest {
             sessionRepository = sessionRepository,
             stateMachine = AlarmStateMachine(),
             alarmScheduler = scheduler,
+            releaseConditionHandlerRegistry =
+                ReleaseConditionHandlerRegistry(
+                    handlers = listOf(ManualReleaseHandler(AlarmStateMachine())),
+                ),
             calculator = NextTriggerCalculator(ZoneId.of("America/Vancouver")),
             clock = clock,
         )

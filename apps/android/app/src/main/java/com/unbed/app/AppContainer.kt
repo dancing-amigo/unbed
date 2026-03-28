@@ -6,12 +6,15 @@ import com.unbed.app.alarm.AlarmCoordinator
 import com.unbed.app.alarm.AlarmNotifier
 import com.unbed.app.alarm.AlarmPlaybackController
 import com.unbed.app.alarm.AndroidAlarmScheduler
+import com.unbed.app.logging.AndroidAppLogger
 import com.unbed.app.setup.DeviceSetupManager
 import com.unbed.app.setup.OnboardingStore
 import com.unbed.core.database.UnbedDatabase
 import com.unbed.core.database.repository.RoomAlarmStore
 import com.unbed.domain.alarm.AlarmStateMachine
+import com.unbed.domain.alarm.ManualReleaseHandler
 import com.unbed.domain.alarm.NextTriggerCalculator
+import com.unbed.domain.alarm.ReleaseConditionHandlerRegistry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -36,6 +39,11 @@ class AppContainer(context: Context) {
     private val clock: Clock = Clock.systemDefaultZone()
     private val stateMachine = AlarmStateMachine()
     private val nextTriggerCalculator = NextTriggerCalculator()
+    private val releaseConditionHandlerRegistry =
+        ReleaseConditionHandlerRegistry(
+            handlers = listOf(ManualReleaseHandler(stateMachine)),
+        )
+    val logger = AndroidAppLogger()
     val alarmPlaybackController = AlarmPlaybackController(context.applicationContext)
     val alarmNotifier = AlarmNotifier(context.applicationContext)
     val onboardingStore = OnboardingStore(context.applicationContext)
@@ -56,6 +64,7 @@ class AppContainer(context: Context) {
             sessionRepository = store,
             stateMachine = stateMachine,
             alarmScheduler = alarmScheduler,
+            releaseConditionHandlerRegistry = releaseConditionHandlerRegistry,
             calculator = nextTriggerCalculator,
             clock = clock,
         )

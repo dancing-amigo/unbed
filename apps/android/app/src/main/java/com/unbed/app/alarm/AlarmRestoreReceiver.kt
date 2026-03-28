@@ -16,6 +16,10 @@ class AlarmRestoreReceiver : BroadcastReceiver() {
 
         application.appContainer.applicationScope.launch {
             try {
+                application.appContainer.logger.info(
+                    tag = "AlarmRestoreReceiver",
+                    message = "Handling system restore action ${intent.action.orEmpty()}",
+                )
                 when (val result = application.appContainer.alarmCoordinator.restoreAfterSystemEvent()) {
                     is RestoreAlarmResult.Ringing -> {
                         application.appContainer.alarmPlaybackController.start()

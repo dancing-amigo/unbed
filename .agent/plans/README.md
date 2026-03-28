@@ -12,6 +12,9 @@
 - STEP8 completed: QR success enters snooze, manual release clears the session, and re-ring scheduling stays active.
 - STEP9 completed: onboarding now gates alarm usage until permissions, device settings, and fixed QR preparation are done.
 - STEP10 completed: boot and clock-change recovery now restores active sessions safely and re-registers future alarms.
+- STEP11 completed: coordinator recovery and QR flows are covered by unit tests, and Compose UI tests were added for onboarding and alarm settings.
+- STEP12 completed: MVP copy, local crash logging, and README/design-doc constraint notes were polished.
+- STEP13 completed: release-condition handlers, future `step_count_release` notes, and contract boundaries were documented and wired in code.
 
 ## STEP1: リポジトリ基盤を作る
 - `.agent/docs` と整合するモノレポ骨格を作る

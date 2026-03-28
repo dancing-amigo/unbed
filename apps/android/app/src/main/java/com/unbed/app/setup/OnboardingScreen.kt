@@ -36,13 +36,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.unbed.app.UnbedApplication
 
-private enum class SetupAction {
-    Notifications,
-    Camera,
-    ExactAlarms,
-    BatteryOptimization,
-}
-
 @Composable
 fun onboardingRoute(onCompleted: () -> Unit) {
     val application = LocalContext.current.applicationContext as UnbedApplication
@@ -136,7 +129,7 @@ private fun handleSetupAction(
 }
 
 @Composable
-private fun onboardingScreen(
+internal fun onboardingScreen(
     uiState: OnboardingUiState,
     onAction: (SetupAction) -> Unit,
     onRefresh: () -> Unit,
@@ -164,6 +157,12 @@ private fun onboardingScreen(
             Text(
                 text = "Finish permissions, system settings, and QR preparation before using alarms.",
                 style = MaterialTheme.typography.bodyLarge,
+            )
+            Text(
+                text =
+                    "MVP limits: one shared QR, camera required, and no fallback dismissal " +
+                        "if scanning is unavailable.",
+                style = MaterialTheme.typography.bodyMedium,
             )
 
             setupRequirementsSection(
@@ -241,6 +240,10 @@ private fun qrPreparationSection(
         Text(
             text = "This QR is shared across all users in the MVP. Put it somewhere away from the bed.",
             style = MaterialTheme.typography.bodyMedium,
+        )
+        Text(
+            text = "Print it or leave it on a second device. Do not keep it within arm's reach of the bed.",
+            style = MaterialTheme.typography.bodySmall,
         )
         Image(
             bitmap = qrBitmap,

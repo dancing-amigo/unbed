@@ -10,18 +10,20 @@ import com.unbed.domain.alarm.AlarmStateMachine
 import com.unbed.domain.alarm.NextTrigger
 import com.unbed.domain.alarm.NextTriggerCalculator
 import com.unbed.domain.alarm.NextTriggerType
+import com.unbed.domain.alarm.ReleaseConditionHandlerRegistry
 import kotlinx.coroutines.flow.Flow
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalTime
 import java.util.UUID
 
-@Suppress("TooManyFunctions")
+@Suppress("LongParameterList", "TooManyFunctions")
 class AlarmCoordinator(
     private val configRepository: AlarmConfigRepository,
     private val sessionRepository: AlarmSessionRepository,
     private val stateMachine: AlarmStateMachine,
     private val alarmScheduler: AlarmScheduler,
+    private val releaseConditionHandlerRegistry: ReleaseConditionHandlerRegistry,
     private val calculator: NextTriggerCalculator,
     private val clock: Clock,
 ) {
@@ -105,8 +107,7 @@ class AlarmCoordinator(
             if (config == null || session == null) {
                 null
             } else {
-                val clearedSession = stateMachine.completeManualRelease(session, clock.instant())
-                stateMachine.finalizeReleasedSession(config, clearedSession)
+                releaseConditionHandlerRegistry.complete(config, session, clock.instant())
             }
         finalizedSession?.let {
             sessionRepository.upsertSession(it)

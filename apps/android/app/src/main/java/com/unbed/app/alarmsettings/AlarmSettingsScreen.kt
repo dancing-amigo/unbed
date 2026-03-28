@@ -58,7 +58,7 @@ fun alarmSettingsRoute(onOpenSetup: () -> Unit = {}) {
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Suppress("LongMethod", "LongParameterList")
 @Composable
-private fun alarmSettingsScreen(
+internal fun alarmSettingsScreen(
     uiState: AlarmSettingsUiState,
     onEnabledChange: (Boolean) -> Unit,
     onRepeatDayToggle: (DayOfWeek) -> Unit,
@@ -96,7 +96,9 @@ private fun alarmSettingsScreen(
                 style = MaterialTheme.typography.headlineMedium,
             )
             Text(
-                text = "Configure one wake-up target now. The data is stored locally and rescheduled on save.",
+                text =
+                    "Configure one wake-up target. Repeating alarms keep rescheduling; " +
+                        "single alarms disable themselves after they fire.",
                 style = MaterialTheme.typography.bodyLarge,
             )
             OutlinedButton(onClick = onOpenSetup) {
@@ -227,6 +229,10 @@ private fun exactAlarmCard(onOpenExactAlarmSettings: () -> Unit) {
         Text(
             text = "Open system settings so Android can fire the alarm close to the requested time.",
             style = MaterialTheme.typography.bodyMedium,
+        )
+        Text(
+            text = "Without this permission Android may delay the alarm, especially on heavily optimized devices.",
+            style = MaterialTheme.typography.bodySmall,
         )
         OutlinedButton(onClick = onOpenExactAlarmSettings) {
             Text("Open exact alarm settings")

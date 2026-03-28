@@ -193,6 +193,12 @@ private fun qrScanScreen(
         if (hasPermission) {
             cameraPreview()
         } else {
+            Text(
+                text =
+                    "If you denied camera access earlier, return to initial setup after this " +
+                        "alarm and re-enable it in system settings.",
+                style = MaterialTheme.typography.bodySmall,
+            )
             Button(onClick = onRequestPermission) {
                 Text("Grant camera permission")
             }

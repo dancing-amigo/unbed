@@ -28,6 +28,10 @@ class AlarmReceiver : BroadcastReceiver() {
 
         application.appContainer.applicationScope.launch {
             try {
+                application.appContainer.logger.info(
+                    tag = "AlarmReceiver",
+                    message = "Received ${triggerType.name} at $triggerAt for session=${sessionId ?: "none"}",
+                )
                 val ringingSession =
                     application.appContainer.alarmCoordinator.handleTrigger(
                         triggerType = triggerType,
@@ -40,6 +44,10 @@ class AlarmReceiver : BroadcastReceiver() {
                         sessionId = ringingSession.sessionId,
                     )
                 } else {
+                    application.appContainer.logger.info(
+                        tag = "AlarmReceiver",
+                        message = "No active ringing session remained after trigger handling",
+                    )
                     application.appContainer.alarmPlaybackController.stop()
                     application.appContainer.alarmNotifier.dismissRingingNotification()
                 }

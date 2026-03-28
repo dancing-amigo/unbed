@@ -7,7 +7,7 @@
 - `repeatDays`: Empty for single alarm, weekday set for repeating alarm.
 - `enabled`: Whether regular scheduling is active.
 - `soundType`: Fixed in MVP.
-- `releaseCondition`: `manual_release` now, `step_count_release` reserved.
+- `releaseCondition`: persisted selector for `manual_release` now, `step_count_release` later.
 
 ## AlarmSession
 
@@ -20,8 +20,8 @@
 - `releasedAt`: Timestamp for release completion.
 - `snoozeCycleCount`: Count of completed re-rings.
 - `sessionEndedReason`: Why the session stopped.
+- release-condition execution is intentionally delegated to a handler boundary so future release logic can change without rewriting session persistence.
 
 ## QrConfig
 
 - `fixedValue`: Shared MVP QR payload used for validation.
-

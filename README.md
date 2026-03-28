@@ -35,3 +35,36 @@ Unbed is an Android-first alarm product that forces a physical wake-up flow:
 - STEP1: Monorepo and Android project foundation
 - STEP2: Alarm domain model and state machine
 - STEP3: Local persistence model and next-trigger calculation
+- STEP4-STEP10: settings UI, alarm dispatch, QR scanning, onboarding, and recovery flow
+- STEP11-STEP13: test coverage, MVP polish, and future release-condition boundaries
+
+## Current MVP Flow
+
+1. Complete onboarding for notifications, camera, exact alarms, battery settings, and fixed QR placement.
+2. Save one local alarm with optional repeat days.
+3. When the alarm fires, scan the fixed QR away from bed.
+4. Enter snooze for 10 minutes.
+5. Tap `Release complete` before the next re-ring, or the alarm loops again.
+
+## Known MVP Constraints
+
+- A single shared fixed QR is used for every user.
+- Camera access is mandatory to clear a ringing alarm.
+- There is no fallback dismissal path when QR scanning is unavailable.
+- Re-rings stop after 10 snooze cycles for a single session.
+- `manual_release` is temporary and intended to be replaced by `step_count_release`.
+- Android is the only supported runtime today.
+
+## Verification Notes
+
+- Repository verification runs with `ktlintCheck detekt test`.
+- Compose UI tests are included under `apps/android/app/src/androidTest`, but no device or emulator was available in this environment to execute them.
+- Real-device checks still need to cover alarm timing accuracy, lock-screen takeover, vendor battery policies, and camera behavior.
+
+## Android Device Checklist
+
+- Grant notifications and camera permission on first launch.
+- Allow exact alarms on Android 12+.
+- Exclude the app from battery optimization on vendors with aggressive background limits.
+- Confirm `BOOT_COMPLETED`, time changes, and timezone changes reschedule the next trigger.
+- Verify QR mismatch keeps the alarm active and QR success enters snooze.
