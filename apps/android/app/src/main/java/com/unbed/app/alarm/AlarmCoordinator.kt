@@ -21,7 +21,7 @@ class AlarmCoordinator(
     private val configRepository: AlarmConfigRepository,
     private val sessionRepository: AlarmSessionRepository,
     private val stateMachine: AlarmStateMachine,
-    private val alarmScheduler: AndroidAlarmScheduler,
+    private val alarmScheduler: AlarmScheduler,
     private val calculator: NextTriggerCalculator,
     private val clock: Clock,
 ) {
@@ -130,6 +130,29 @@ class AlarmCoordinator(
         return updatedSession?.takeIf { it.state == AlarmState.RINGING }
     }
 
+    suspend fun restoreAfterSystemEvent(now: Instant = clock.instant()): RestoreAlarmResult {
+        val config = configRepository.getConfig()
+        val activeSession = sessionRepository.getActiveSession()
+        val restoredSession =
+            when {
+                activeSession == null -> null
+                shouldForceRinging(activeSession, now) -> activeSession.forceRingingRecovery()
+                shouldFinalizeRecoveredSession(activeSession) && config != null ->
+                    stateMachine.finalizeReleasedSession(config, activeSession)
+                else -> activeSession
+            }
+
+        if (restoredSession != null && restoredSession != activeSession) {
+            sessionRepository.upsertSession(restoredSession)
+        }
+
+        val nextTrigger = alarmScheduler.reschedule()
+        return restoredSession
+            ?.takeIf { it.state == AlarmState.RINGING }
+            ?.let(RestoreAlarmResult::Ringing)
+            ?: RestoreAlarmResult.Rescheduled(nextTrigger)
+    }
+
     private suspend fun handleRegularAlarmTrigger(
         config: AlarmConfig,
         triggerAt: Instant,
@@ -183,10 +206,49 @@ class AlarmCoordinator(
         )
     }
 
+    private fun shouldForceRinging(
+        session: AlarmSession,
+        now: Instant,
+    ): Boolean {
+        return when (session.state) {
+            AlarmState.SCHEDULED,
+            AlarmState.RINGING,
+            AlarmState.SCANNING_QR,
+            -> true
+
+            AlarmState.SNOOZED_WAITING_RELEASE -> {
+                val snoozeUntil = session.snoozeUntil
+                snoozeUntil == null || !snoozeUntil.isAfter(now)
+            }
+
+            AlarmState.CLEARED,
+            AlarmState.IDLE,
+            -> false
+        }
+    }
+
+    private fun shouldFinalizeRecoveredSession(session: AlarmSession): Boolean {
+        return session.state == AlarmState.CLEARED
+    }
+
+    private fun AlarmSession.forceRingingRecovery(): AlarmSession {
+        return copy(
+            state = AlarmState.RINGING,
+            qrValidatedAt = null,
+            snoozeUntil = null,
+        )
+    }
+
     companion object {
         const val DEFAULT_ALARM_ID: Long = 1L
         val DEFAULT_ALARM_TIME: LocalTime = LocalTime.of(7, 0)
     }
+}
+
+sealed interface RestoreAlarmResult {
+    data class Ringing(val session: AlarmSession) : RestoreAlarmResult
+
+    data class Rescheduled(val nextTrigger: NextTrigger?) : RestoreAlarmResult
 }
 
 sealed interface QrSubmissionResult {

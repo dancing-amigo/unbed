@@ -6,6 +6,8 @@ import com.unbed.app.alarm.AlarmCoordinator
 import com.unbed.app.alarm.AlarmNotifier
 import com.unbed.app.alarm.AlarmPlaybackController
 import com.unbed.app.alarm.AndroidAlarmScheduler
+import com.unbed.app.setup.DeviceSetupManager
+import com.unbed.app.setup.OnboardingStore
 import com.unbed.core.database.UnbedDatabase
 import com.unbed.core.database.repository.RoomAlarmStore
 import com.unbed.domain.alarm.AlarmStateMachine
@@ -14,7 +16,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import java.time.Clock
-import java.time.ZoneId
 
 class AppContainer(context: Context) {
     val applicationScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -34,9 +35,11 @@ class AppContainer(context: Context) {
 
     private val clock: Clock = Clock.systemDefaultZone()
     private val stateMachine = AlarmStateMachine()
-    private val nextTriggerCalculator = NextTriggerCalculator(ZoneId.systemDefault())
+    private val nextTriggerCalculator = NextTriggerCalculator()
     val alarmPlaybackController = AlarmPlaybackController(context.applicationContext)
     val alarmNotifier = AlarmNotifier(context.applicationContext)
+    val onboardingStore = OnboardingStore(context.applicationContext)
+    val deviceSetupManager = DeviceSetupManager(context.applicationContext)
 
     val alarmScheduler =
         AndroidAlarmScheduler(

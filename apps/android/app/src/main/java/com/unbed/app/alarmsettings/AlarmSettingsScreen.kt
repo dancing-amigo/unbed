@@ -36,7 +36,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun alarmSettingsRoute() {
+fun alarmSettingsRoute(onOpenSetup: () -> Unit = {}) {
     val application = LocalContext.current.applicationContext as UnbedApplication
     val settingsViewModel: AlarmSettingsViewModel =
         viewModel(
@@ -50,6 +50,7 @@ fun alarmSettingsRoute() {
         onRepeatDayToggle = settingsViewModel::onRepeatDayToggle,
         onTimeChange = settingsViewModel::onTimeChange,
         onOpenExactAlarmSettings = settingsViewModel::openExactAlarmSettings,
+        onOpenSetup = onOpenSetup,
         onSave = settingsViewModel::save,
     )
 }
@@ -63,6 +64,7 @@ private fun alarmSettingsScreen(
     onRepeatDayToggle: (DayOfWeek) -> Unit,
     onTimeChange: (Int, Int) -> Unit,
     onOpenExactAlarmSettings: () -> Unit,
+    onOpenSetup: () -> Unit,
     onSave: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -97,6 +99,9 @@ private fun alarmSettingsScreen(
                 text = "Configure one wake-up target now. The data is stored locally and rescheduled on save.",
                 style = MaterialTheme.typography.bodyLarge,
             )
+            OutlinedButton(onClick = onOpenSetup) {
+                Text("Review initial setup")
+            }
 
             if (!uiState.canScheduleExactAlarms) {
                 exactAlarmCard(onOpenExactAlarmSettings = onOpenExactAlarmSettings)

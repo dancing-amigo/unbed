@@ -9,8 +9,10 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 class NextTriggerCalculator(
-    private val zoneId: ZoneId,
+    private val zoneIdProvider: () -> ZoneId = { ZoneId.systemDefault() },
 ) {
+    constructor(zoneId: ZoneId) : this({ zoneId })
+
     private companion object {
         const val MAX_REPEAT_LOOKAHEAD_DAYS: Long = 7L
     }
@@ -20,6 +22,7 @@ class NextTriggerCalculator(
         activeSession: AlarmSession?,
         now: Instant,
     ): NextTrigger? {
+        val zoneId = zoneIdProvider()
         val currentDateTime = ZonedDateTime.ofInstant(now, zoneId)
         val regularTrigger =
             config

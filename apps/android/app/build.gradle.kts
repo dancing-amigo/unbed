@@ -62,7 +62,10 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.room.runtime)
+    implementation(libs.zxing.core)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+    testImplementation(libs.junit4)
+    testImplementation(libs.truth)
 
     debugImplementation(libs.compose.ui.tooling)
 }

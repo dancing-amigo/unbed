@@ -18,10 +18,10 @@ class AndroidAlarmScheduler(
     private val sessionRepository: AlarmSessionRepository,
     private val calculator: NextTriggerCalculator,
     private val clock: Clock,
-) {
+) : AlarmScheduler {
     private val alarmManager: AlarmManager = context.getSystemService(AlarmManager::class.java)
 
-    suspend fun reschedule(): NextTrigger? {
+    override suspend fun reschedule(): NextTrigger? {
         val nextTrigger =
             calculator.calculate(
                 config = configRepository.getConfig(),
@@ -37,7 +37,7 @@ class AndroidAlarmScheduler(
         alarmManager.cancel(createPendingIntent(null))
     }
 
-    fun canScheduleExactAlarms(): Boolean {
+    override fun canScheduleExactAlarms(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             alarmManager.canScheduleExactAlarms()
         } else {
@@ -45,7 +45,7 @@ class AndroidAlarmScheduler(
         }
     }
 
-    fun openExactAlarmSettings() {
+    override fun openExactAlarmSettings() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val intent =
                 Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {

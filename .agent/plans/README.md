@@ -10,6 +10,8 @@
 - STEP6 completed: high-priority alarm notification, full-screen ringing activity, and playback control were added.
 - STEP7 completed: CameraX and ML Kit QR scanning now validate only the fixed MVP QR marker.
 - STEP8 completed: QR success enters snooze, manual release clears the session, and re-ring scheduling stays active.
+- STEP9 completed: onboarding now gates alarm usage until permissions, device settings, and fixed QR preparation are done.
+- STEP10 completed: boot and clock-change recovery now restores active sessions safely and re-registers future alarms.
 
 ## STEP1: リポジトリ基盤を作る
 - `.agent/docs` と整合するモノレポ骨格を作る
