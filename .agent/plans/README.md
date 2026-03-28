@@ -8,6 +8,8 @@
 - STEP4 completed: Compose alarm settings UI now saves locally and reschedules the next alarm.
 - STEP5 completed: AlarmManager scheduling, receiver dispatch, and re-schedule conflict handling were connected.
 - STEP6 completed: high-priority alarm notification, full-screen ringing activity, and playback control were added.
+- STEP7 completed: CameraX and ML Kit QR scanning now validate only the fixed MVP QR marker.
+- STEP8 completed: QR success enters snooze, manual release clears the session, and re-ring scheduling stays active.
 
 ## STEP1: リポジトリ基盤を作る
 - `.agent/docs` と整合するモノレポ骨格を作る

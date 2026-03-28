@@ -1,6 +1,7 @@
 [versions]
 activityCompose = "1.9.2"
 agp = "8.5.2"
+cameraX = "1.4.2"
 composeBom = "2024.09.03"
 coroutines = "1.8.1"
 coreKtx = "1.13.1"
@@ -11,6 +12,7 @@ kotlin = "2.0.21"
 ksp = "2.0.21-1.0.27"
 ktlint = "12.1.1"
 lifecycle = "2.8.6"
+mlkitBarcode = "17.3.0"
 mockk = "1.13.12"
 room = "2.6.1"
 truth = "1.4.4"
@@ -19,6 +21,10 @@ turbine = "1.1.0"
 [libraries]
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraX" }
+camera-core = { module = "androidx.camera:camera-core", version.ref = "cameraX" }
+camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraX" }
+camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraX" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
 compose-material3 = { module = "androidx.compose.material3:material3" }
 compose-ui = { module = "androidx.compose.ui:ui" }
@@ -29,6 +35,7 @@ desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref 
 junit4 = { module = "junit:junit", version.ref = "junit4" }
 lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+mlkit-barcode = { module = "com.google.mlkit:barcode-scanning", version.ref = "mlkitBarcode" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 room-common = { module = "androidx.room:room-common", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }

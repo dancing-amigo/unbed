@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
@@ -34,7 +35,13 @@
             android:theme="@style/Theme.Unbed" />
 
         <activity
-            android:name=".ringing.QrScanPlaceholderActivity"
+            android:name=".qr.QrScanActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:theme="@style/Theme.Unbed" />
+
+        <activity
+            android:name=".snooze.SnoozeWaitingActivity"
             android:excludeFromRecents="true"
             android:exported="false"
             android:theme="@style/Theme.Unbed" />

@@ -4,6 +4,7 @@ import com.unbed.core.model.AlarmConfig
 import com.unbed.core.model.AlarmSession
 import com.unbed.core.model.AlarmState
 import com.unbed.domain.alarm.AlarmConfigRepository
+import com.unbed.domain.alarm.AlarmPolicy
 import com.unbed.domain.alarm.AlarmSessionRepository
 import com.unbed.domain.alarm.AlarmStateMachine
 import com.unbed.domain.alarm.NextTrigger
@@ -35,6 +36,10 @@ class AlarmCoordinator(
         return alarmScheduler.reschedule()
     }
 
+    suspend fun getSession(sessionId: String): AlarmSession? {
+        return sessionRepository.getSession(sessionId)
+    }
+
     suspend fun peekNextTrigger(config: AlarmConfig? = null): NextTrigger? {
         return calculator.calculate(
             config = config ?: configRepository.getConfig(),
@@ -47,6 +52,67 @@ class AlarmCoordinator(
 
     fun openExactAlarmSettings() {
         alarmScheduler.openExactAlarmSettings()
+    }
+
+    suspend fun beginQrScan(sessionId: String): AlarmSession? {
+        val session = sessionRepository.getSession(sessionId) ?: return null
+        val updatedSession =
+            if (session.state == AlarmState.SCANNING_QR) {
+                session
+            } else {
+                stateMachine.beginQrScan(session)
+            }
+        sessionRepository.upsertSession(updatedSession)
+        return updatedSession
+    }
+
+    suspend fun cancelQrScan(sessionId: String): AlarmSession? {
+        val session = sessionRepository.getSession(sessionId) ?: return null
+        val updatedSession =
+            if (session.state == AlarmState.SCANNING_QR) {
+                stateMachine.cancelQrScan(session)
+            } else {
+                session
+            }
+        sessionRepository.upsertSession(updatedSession)
+        return updatedSession
+    }
+
+    suspend fun submitQrCode(
+        sessionId: String,
+        scannedValue: String,
+    ): QrSubmissionResult {
+        val session = sessionRepository.getSession(sessionId)
+        val result =
+            when {
+                session == null -> QrSubmissionResult.SessionUnavailable
+                session.state != AlarmState.SCANNING_QR -> QrSubmissionResult.InvalidState(session.state)
+                scannedValue != AlarmPolicy.DEFAULT_QR_CONFIG.fixedValue -> QrSubmissionResult.Mismatch
+                else -> {
+                    val snoozedSession = stateMachine.validateQr(session, clock.instant())
+                    sessionRepository.upsertSession(snoozedSession)
+                    alarmScheduler.reschedule()
+                    QrSubmissionResult.Matched(snoozedSession)
+                }
+            }
+        return result
+    }
+
+    suspend fun completeRelease(sessionId: String): AlarmSession? {
+        val config = configRepository.getConfig()
+        val session = sessionRepository.getSession(sessionId)
+        val finalizedSession =
+            if (config == null || session == null) {
+                null
+            } else {
+                val clearedSession = stateMachine.completeManualRelease(session, clock.instant())
+                stateMachine.finalizeReleasedSession(config, clearedSession)
+            }
+        finalizedSession?.let {
+            sessionRepository.upsertSession(it)
+            alarmScheduler.reschedule()
+        }
+        return finalizedSession
     }
 
     suspend fun handleTrigger(
@@ -121,4 +187,14 @@ class AlarmCoordinator(
         const val DEFAULT_ALARM_ID: Long = 1L
         val DEFAULT_ALARM_TIME: LocalTime = LocalTime.of(7, 0)
     }
+}
+
+sealed interface QrSubmissionResult {
+    data class Matched(val session: AlarmSession) : QrSubmissionResult
+
+    data object Mismatch : QrSubmissionResult
+
+    data object SessionUnavailable : QrSubmissionResult
+
+    data class InvalidState(val state: AlarmState) : QrSubmissionResult
 }

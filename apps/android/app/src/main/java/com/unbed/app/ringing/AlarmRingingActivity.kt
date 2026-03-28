@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.unbed.app.UnbedApplication
 import com.unbed.app.alarm.AlarmNotifier
+import com.unbed.app.qr.QrScanActivity
 import com.unbed.app.ui.theme.unbedTheme
 
 class AlarmRingingActivity : ComponentActivity() {
@@ -37,10 +38,11 @@ class AlarmRingingActivity : ComponentActivity() {
                     ringingScreen(
                         onOpenQr = {
                             startActivity(
-                                Intent(this, QrScanPlaceholderActivity::class.java).apply {
+                                Intent(this, QrScanActivity::class.java).apply {
                                     putExtra(AlarmNotifier.EXTRA_SESSION_ID, sessionId)
                                 },
                             )
+                            finish()
                         },
                     )
                 }
